@@ -21,4 +21,5 @@ make up
 ## Dependencies
 
 - arduino-cli (see [getting started](https://arduino.github.io/arduino-cli/0.29/getting-started/) for initial setup)
+- GNU Make
 
