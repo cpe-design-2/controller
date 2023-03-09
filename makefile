@@ -1,6 +1,6 @@
 # File: makefile
 # Description:
-# 	Compiles the C code for the targeted Arduino microcontroller.
+# 	Compiles the C code for the targeted Arduino microcontroller.make 
 
 # to see the desired port and board-id run: `arduino-cli board list`
 PORT=COM9
