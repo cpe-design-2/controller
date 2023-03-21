@@ -1,4 +1,4 @@
-21454874159331511
+21456553158029740
 Arduino Pro Micro
 ProMicro
 Pro Micro footprint
@@ -89599,3 +89599,10 @@ varistor
 0
 2
 2
+controller
+SW_PUSH_4_PIN
+https://www.omron.com/ecb/products/pdf/en-b3f.pdf
+tact sw push 6mm
+0
+4
+4

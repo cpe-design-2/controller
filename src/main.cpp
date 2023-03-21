@@ -8,6 +8,7 @@ Details:
 #include "arduino.h"
 #include "Keyboard/src/Keyboard.h"
 #include "Mouse/src/Mouse.h"
+#include "Joystick/Joystick.h"
 
 
 // WASD CONTROL
@@ -72,7 +73,6 @@ void setup() {
     pinMode(S_Button, INPUT);
     pinMode(A_Button, INPUT);
     pinMode(D_Button, INPUT);
-    pinMode(9, INPUT); // TEMP INPUT TO TEST LEFT MOUSE CLICK
 
     Keyboard.begin();
     Mouse.begin();
@@ -85,7 +85,8 @@ void loop() {
 
     Mouse.move(-x_move, y_move, 0);  
 
-    if (digitalRead(JS_1_Button) == HIGH) {
+    
+    if (digitalRead(JS_1_Button) != HIGH) {
     // if the mouse is not pressed, press it:
       if (!Mouse.isPressed(MOUSE_LEFT)) {
         Mouse.press(MOUSE_LEFT);
@@ -100,22 +101,7 @@ void loop() {
         delay(DELAY);
       }
     }
-
-    if (digitalRead(9) == HIGH) {
-    // if the mouse is not pressed, press it:
-      if (!Mouse.isPressed(MOUSE_LEFT)) {
-        Mouse.press(MOUSE_LEFT);
-        delay(DELAY);
-      }
-    }
-    // else the mouse button is not pressed:
-    else {
-      // if the mouse is pressed, release it:
-      if (Mouse.isPressed(MOUSE_LEFT)) {
-        Mouse.release(MOUSE_LEFT);
-        delay(DELAY);
-      }
-    }
+    
     
     // WASD Control:
     if(digitalRead(W_Button) == HIGH){
@@ -137,5 +123,11 @@ void loop() {
       Keyboard.press('d');
       delay(DELAY);
    } else Keyboard.release('d');
+
+   //A1 / spacebar control
+   if(digitalRead(A1_Button) == HIGH){
+      Keyboard.write((char) 32);
+      delay(DELAY);
+    }
 }
 
