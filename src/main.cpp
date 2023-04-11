@@ -43,7 +43,7 @@ const int DELAY = 10;
 const int RANGE = 12;             // output range of X or Y movement
 const int THRESHOLD = RANGE / 4;  // resting threshold
 const int CENTER = RANGE / 2;     // resting position value
-const int MULTIPLIER = 3;         // scalar to move mouse quicker
+const int MULTIPLIER = 6;         // scalar to move mouse quicker
 
 // Function to read X and Y axis for mouse control
 int readAxis(int axis){
