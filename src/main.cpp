@@ -29,8 +29,8 @@ const int PAUSE_BUTTON = 16;
 
 // JOYSTICK 1/MOUSE CONTROL 
 const int JS_1_BUTTON = 14;  // Push button
-const int JS_1_X = A1;       // X-axis
-const int JS_1_Y = A0;       // Y-axis
+const int JS_1_X = A0;       // X-axis
+const int JS_1_Y = A1;       // Y-axis
 
 // JOYSTICK 2 CONTROL
 const int JS_2_BUTTON = 15;  // Push button
@@ -43,6 +43,7 @@ const int DELAY = 10;
 const int RANGE = 12;             // output range of X or Y movement
 const int THRESHOLD = RANGE / 4;  // resting threshold
 const int CENTER = RANGE / 2;     // resting position value
+const int MULTIPLIER = 3;         // scalar to move mouse quicker
 
 // Function to read X and Y axis for mouse control
 int readAxis(int axis){
@@ -50,7 +51,7 @@ int readAxis(int axis){
   int read = analogRead(axis); //read the current axis
   read = map(read, 0, 1023, 0, RANGE);
   
-  int to_return = read - CENTER;
+  int to_return = (read - CENTER) * MULTIPLIER;
 
   if(abs(to_return) < THRESHOLD){ //don't move mouse if mouse read is too small, prevents joycon drift
     to_return = 0;
@@ -67,66 +68,65 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD,
   false, false, false);  // No accelerator, brake, or steering
 
 void setup() {
-    Serial.begin(9600);
-    if(!KEYBOARD){ // if in JOYSTICK mode
-      /* Initialize pins */
-      // D-PAD
-      pinMode(UP_BUTTON, INPUT_PULLUP);
-      pinMode(DOWN_BUTTON, INPUT_PULLUP);
-      pinMode(LEFT_BUTTON, INPUT_PULLUP);
-      pinMode(RIGHT_BUTTON, INPUT_PULLUP);
+  Serial.begin(9600);
+  // if in JOYSTICK mode
+  if (!KEYBOARD) { 
+    /* Initialize pins */
+    // D-PAD
+    pinMode(UP_BUTTON, INPUT_PULLUP);
+    pinMode(DOWN_BUTTON, INPUT_PULLUP);
+    pinMode(LEFT_BUTTON, INPUT_PULLUP);
+    pinMode(RIGHT_BUTTON, INPUT_PULLUP);
 
-      // AB/XY
-      pinMode(A_BUTTON, INPUT_PULLUP);
-      pinMode(B_BUTTON, INPUT_PULLUP);
-      pinMode(X_BUTTON, INPUT_PULLUP);
-      pinMode(Y_BUTTON, INPUT_PULLUP);
+    // AB/XY
+    pinMode(A_BUTTON, INPUT_PULLUP);
+    pinMode(B_BUTTON, INPUT_PULLUP);
+    pinMode(X_BUTTON, INPUT_PULLUP);
+    pinMode(Y_BUTTON, INPUT_PULLUP);
 
-      // PAUSE and HOME
-      pinMode(HOME_BUTTON, INPUT_PULLUP);
-      pinMode(PAUSE_BUTTON, INPUT_PULLUP);
+    // PAUSE and HOME
+    pinMode(HOME_BUTTON, INPUT_PULLUP);
+    pinMode(PAUSE_BUTTON, INPUT_PULLUP);
 
-      // JOYSTICK 1 control
-      pinMode(JS_1_BUTTON, INPUT_PULLUP);
-      pinMode(JS_1_X, INPUT);
-      pinMode(JS_1_Y, INPUT);
+    // JOYSTICK 1 control
+    pinMode(JS_1_BUTTON, INPUT_PULLUP);
+    pinMode(JS_1_X, INPUT);
+    pinMode(JS_1_Y, INPUT);
 
-      // JOYSTICK 2 control
-      pinMode(JS_2_BUTTON, INPUT_PULLUP); 
-      pinMode(JS_2_X, INPUT);
-      pinMode(JS_2_Y, INPUT);
+    // JOYSTICK 2 control
+    pinMode(JS_2_BUTTON, INPUT_PULLUP); 
+    pinMode(JS_2_X, INPUT);
+    pinMode(JS_2_Y, INPUT);
 
-      // Initialize the Joystick library
-      Joystick.begin();
-      Joystick.setXAxisRange(-1, 1);
-      Joystick.setYAxisRange(-1, 1);
-    }
+    // Initialize the Joystick library
+    Joystick.begin();
+    Joystick.setXAxisRange(-1, 1);
+    Joystick.setYAxisRange(-1, 1);
+  } else {
+    //Initialize pins
+    pinMode(UP_BUTTON, INPUT);
+    pinMode(DOWN_BUTTON, INPUT);
+    pinMode(LEFT_BUTTON, INPUT);
+    pinMode(RIGHT_BUTTON, INPUT);
 
-    else{
-      //Initialize pins
-      pinMode(UP_BUTTON, INPUT);
-      pinMode(DOWN_BUTTON, INPUT);
-      pinMode(LEFT_BUTTON, INPUT);
-      pinMode(RIGHT_BUTTON, INPUT);
+    pinMode(A_BUTTON, INPUT); 
+    pinMode(B_BUTTON, INPUT);
+    pinMode(X_BUTTON, INPUT);
+    pinMode(Y_BUTTON, INPUT);         
 
-      pinMode(A_BUTTON, INPUT); 
-      pinMode(B_BUTTON, INPUT);
-      pinMode(X_BUTTON, INPUT);
-      pinMode(Y_BUTTON, INPUT);         
+    pinMode(HOME_BUTTON, INPUT);
+    pinMode(PAUSE_BUTTON, INPUT);
 
-      pinMode(HOME_BUTTON, INPUT);
-      pinMode(PAUSE_BUTTON, INPUT);
+    pinMode(JS_1_BUTTON, INPUT_PULLUP);
+    pinMode(JS_2_BUTTON, INPUT); 
 
-      pinMode(JS_1_BUTTON, INPUT);
-      pinMode(JS_2_BUTTON, INPUT); 
-
-      Keyboard.begin();
-      Mouse.begin();
-    }
+    Keyboard.begin();
+    Mouse.begin();
+  }
 }
 
 void loop() { 
-  if(!KEYBOARD){
+  if (!KEYBOARD) {
     // Set the button states
     Joystick.setButton(0, digitalRead(UP_BUTTON));
     Joystick.setButton(1, digitalRead(DOWN_BUTTON));
@@ -168,29 +168,20 @@ void loop() {
 
     // Wait for a short time before sending the next state
     delay(DELAY);
-  }
-  
-  else{
+  // KEYBOARD CONFIGURATION
+  } else {
     // Mouse Control:
     int x_move = readAxis(JS_1_X);
     int y_move = readAxis(JS_1_Y);
 
-    Mouse.move(-x_move, y_move, 0);  
+    Mouse.move(x_move, y_move, 0);  
+
+    Serial.print(digitalRead(JS_1_BUTTON));
     
-    if (digitalRead(JS_1_BUTTON) != HIGH) {
-    // if the mouse is not pressed, press it:
-      if (!Mouse.isPressed(MOUSE_LEFT)) {
-        Mouse.press(MOUSE_LEFT);
-        delay(DELAY);
-      }
-    }
-    // else the mouse button is not pressed:
-    else {
-      // if the mouse is pressed, release it:
-      if (Mouse.isPressed(MOUSE_LEFT)) {
+    if (digitalRead(JS_1_BUTTON) == HIGH && Mouse.isPressed(MOUSE_LEFT) == true) {
         Mouse.release(MOUSE_LEFT);
-        delay(DELAY);
-      }
+    } else if (digitalRead(JS_1_BUTTON) != HIGH && Mouse.isPressed(MOUSE_LEFT) == false) {
+        Mouse.press(MOUSE_LEFT);
     }
     
     // WASD Control:
