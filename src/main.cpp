@@ -59,16 +59,16 @@ int readAxis(int axis){
   return to_return;
 }
 
+Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD,
+  12, 0,                 // Button Count, Hat Switch Count
+  true, true, true,      // X and Y, but no Z Axis
+  true, true, true,      // Rx, Ry, or Rz
+  false, false,          // No rudder or throttle
+  false, false, false);  // No accelerator, brake, or steering
+
 void setup() {
     Serial.begin(9600);
     if(!KEYBOARD){ // if in JOYSTICK mode
-      Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD,
-        12, 0,                 // Button Count, Hat Switch Count
-        true, true, true,      // X and Y, but no Z Axis
-        true, true, true,      // Rx, Ry, or Rz
-        false, false,          // No rudder or throttle
-        false, false, false);  // No accelerator, brake, or steering
-
       /* Initialize pins */
       // D-PAD
       pinMode(UP_BUTTON, INPUT_PULLUP);
@@ -109,16 +109,16 @@ void setup() {
       pinMode(LEFT_BUTTON, INPUT);
       pinMode(RIGHT_BUTTON, INPUT);
 
-      pinmode(A_BUTTON, INPUT); 
-      pinmode(B_BUTTON, INPUT);
-      pinmode(X_BUTTON, INPUT);
-      pinmode(Y_BUTTON, INPUT);         
+      pinMode(A_BUTTON, INPUT); 
+      pinMode(B_BUTTON, INPUT);
+      pinMode(X_BUTTON, INPUT);
+      pinMode(Y_BUTTON, INPUT);         
 
-      pinmode(HOME_BUTTON, INPUT);
-      pinmode(PAUSE_BUTTON, INPUT);
+      pinMode(HOME_BUTTON, INPUT);
+      pinMode(PAUSE_BUTTON, INPUT);
 
-      pinmode(JS_1_BUTTON, INPUT);
-      pinmode(JS_2_BUTTON, INPUT); 
+      pinMode(JS_1_BUTTON, INPUT);
+      pinMode(JS_2_BUTTON, INPUT); 
 
       Keyboard.begin();
       Mouse.begin();
@@ -177,7 +177,7 @@ void loop() {
 
     Mouse.move(-x_move, y_move, 0);  
     
-    if (digitalRead(JS_1_Button) != HIGH) {
+    if (digitalRead(JS_1_BUTTON) != HIGH) {
     // if the mouse is not pressed, press it:
       if (!Mouse.isPressed(MOUSE_LEFT)) {
         Mouse.press(MOUSE_LEFT);
