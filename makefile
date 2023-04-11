@@ -12,7 +12,7 @@ cc:
 
 .PHONY: up
 up:
-	arduino-cli upload --fqbn arduino-cli compile --fqbn arduino:avr:leonardo -p COM9 --input-dir build/out
+	arduino-cli upload --fqbn arduino-cli compile --fqbn arduino:avr:leonardo -p COM11 --input-dir build/out
 
 .PHONY: clean
 clean:

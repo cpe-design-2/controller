@@ -6,8 +6,8 @@ Details:
 
 #include "controller.h"
 #include "arduino.h"
-#include "Keyboard/src/Keyboard.h"
-#include "Mouse/src/Mouse.h"
+//#include "Keyboard/src/Keyboard.h"
+//#include "Mouse/src/Mouse.h"
 #include "Joystick/Joystick.h"
 
 
@@ -46,10 +46,11 @@ Controller* c = nullptr;
 
 Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD,
   12, 0,                 // Button Count, Hat Switch Count
-  true, true, true,      // X and Y, but no Z Axis
-  true, true, true,      // Rx, Ry, or Rz
+  true, true, false,     // X, Y, and Z Axis
+  true, true, false,     // Rx, Ry, and Rz
   false, false,          // No rudder or throttle
   false, false, false);  // No accelerator, brake, or steering
+
 
 void setup() {
     c = new Controller();
@@ -89,7 +90,47 @@ void setup() {
 }
 
 void loop() { 
-  
+
+  // Set the button states
+  Joystick.setButton(0, digitalRead(UP_BUTTON));
+  Joystick.setButton(1, digitalRead(DOWN_BUTTON));
+  Joystick.setButton(2, digitalRead(LEFT_BUTTON));
+  Joystick.setButton(3, digitalRead(RIGHT_BUTTON));
+
+  Joystick.setButton(4, digitalRead(A_BUTTON));
+  Joystick.setButton(5, digitalRead(B_BUTTON));
+  Joystick.setButton(6, digitalRead(X_BUTTON));
+  Joystick.setButton(7, digitalRead(Y_BUTTON));
+
+  Joystick.setButton(8, digitalRead(HOME_BUTTON));
+  Joystick.setButton(9, digitalRead(PAUSE_BUTTON));
+
+  Joystick.setButton(10, !digitalRead(JS_1_BUTTON));
+  Joystick.setButton(11, !digitalRead(JS_2_BUTTON));
+
+  // Read the values from the joysticks
+  int joystick_1_x = analogRead(JS_1_X);
+  int joystick_1_y = analogRead(JS_1_Y);
+  int joystick_2_x = analogRead(JS_2_X);
+  int joystick_2_y = analogRead(JS_2_Y);
+
+  // Convert the analog values
+  int joystick_1_x_mapped = map(joystick_1_x, 0, 1023, -1, 1);
+  int joystick_1_y_mapped = map(joystick_1_y, 0, 1023, -1, 1);
+  int joystick_2_x_mapped = map(joystick_2_x, 0, 1023, -1, 1);
+  int joystick_2_y_mapped = map(joystick_2_y, 0, 1023, -1, 1);
+
+
+  // Set the values for the joystick object
+  Joystick.setXAxis(joystick_1_x_mapped);
+  Joystick.setYAxis(joystick_1_y_mapped);
+  Joystick.setRxAxis(joystick_2_x_mapped);
+  Joystick.setRyAxis(joystick_2_y_mapped);
+
+  // Send the joystick values to the computer
+  Joystick.sendState();
+
+  // Wait for a short time before sending the next state
   delay(DELAY);
 }
 
